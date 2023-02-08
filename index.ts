@@ -8,7 +8,7 @@ export const launchFaBot = async () => {
     defaultViewport: { width: 600, height: 800 }
   });
 
-  for (let i = 5; i <= 12; i++) {
+  for (let i = 1; i <= 12; i++) {
     console.log('Page:', i);
     const page = await browser.newPage();
     await page.goto(`https://fontawesome.com/search?o=r&m=free&f=classic%2Cbrands&p=${i}`, { waitUntil: 'networkidle2' });
