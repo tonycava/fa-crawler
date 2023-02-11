@@ -30,7 +30,7 @@ export const launchFaBot = async () => {
       const style = svg?.at(-1);
 
       let destination = `https://fontawesome.com/icons/${icon}?s=${style}&f=${format}`;
-      if (!format || !icon || !style) {
+      if (!icon) {
         const newRegex = /^(icon)-(\w+)-(\w+(-\w+)*)-$/;
         const match = articles[i]?.match(newRegex);
         destination = `https://fontawesome.com/icons/${match?.at(3)}?s=&f=brands`;
@@ -42,21 +42,19 @@ export const launchFaBot = async () => {
       const newPage = await browser.newPage();
       await newPage.goto(destination, { waitUntil: 'networkidle2' });
 
-      await newPage.waitForSelector('button[aria-label="Copy SVG code"]')
+      await newPage.waitForSelector('button[aria-label="Copy SVG code"]');
       await newPage.click('button[aria-label="Copy SVG code"]');
 
       const svgCode = await newPage.evaluate(() => navigator.clipboard.readText());
       const fileContent = '<script lang=\'ts\'>\n export let color = "white";\n</script>\n\n' + svgCode.replace('<path', '<path fill="{color}"');
 
-      fs.writeFile(`./svg/Icon${kebabToPascal(icon)}.svelte`, fileContent, (err) => console.log(err, 'At:', i));
+      fs.writeFile(`./svg/Icon${kebabToPascal(icon)}${capitalize(style ?? '')}.svelte`, fileContent, (err) => console.log(err, 'At:', i));
       await newPage.close();
     }
   }
   await browser.close();
 };
-
-const kebabToPascal = (str: string) => {
-  return str.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('');
-};
+const capitalize = (word: string) => word.charAt(0).toUpperCase() + word.slice(1);
+const kebabToPascal = (str: string) => str.split('-').map(capitalize).join('');
 
 launchFaBot();
